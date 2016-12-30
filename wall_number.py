@@ -1,12 +1,17 @@
-import collections
-from copy import deepcopy, copy
+import os
+from collections import namedtuple
+from copy import copy
 from datetime import datetime
-Map = collections.namedtuple("Map", "height width numbers")
-Point = collections.namedtuple("Point", "x y")
-Line = collections.namedtuple("Line", "p1 p2")
-StackElem = collections.namedtuple("StackElem", "last_point first_path lines")
-Number = collections.namedtuple("Number", "p number")
- 
+from time import sleep
+
+Map = namedtuple("Map", "height width numbers")
+Point = namedtuple("Point", "x y")
+Line = namedtuple("Line", "p1 p2")
+StackElem = namedtuple("StackElem", "last_point first_path lines")
+Number = namedtuple("Number", "p number")
+
+VISUAL = False
+
 maps = [
     Map(height=2, width=2, 
       numbers = [
@@ -73,6 +78,26 @@ maps = [
         Number(Point(4, 5), 2),
         Number(Point(5, 5), 1),
     ]),
+    
+    Map(height=6, width=6, 
+      numbers = [
+        Number(Point(0, 0), 0),
+        Number(Point(3, 0), 1),
+        Number(Point(4, 0), 3),
+        Number(Point(1, 1), 2),
+        Number(Point(4, 1), 2),
+        Number(Point(5, 1), 0),
+        Number(Point(0, 2), 3),
+        Number(Point(3, 2), 2),
+        Number(Point(5, 2), 1),
+        Number(Point(0, 3), 2),
+        Number(Point(4, 3), 2),
+        Number(Point(2, 4), 0),
+        Number(Point(5, 4), 1),
+        Number(Point(1, 5), 2),
+        Number(Point(2, 5), 3),
+        Number(Point(3, 5), 2),
+    ]),
   ]
  
 DIRECT = [
@@ -103,10 +128,8 @@ def lineToPoints(lines):
   return [lines[0].p1] + [l.p2 for l in lines]
 
 def check(lines, line, map):
-  if line.p2.x < 0 or line.p2.y < 0 or line.p2.x > map.width or line.p2.y > map.height:
-    return CHECK_FAILED
-     
-  if line.p2 in lineToPoints(lines):
+  path_points = lineToPoints(lines)
+  if line.p2 in path_points:
     if line.p2 != lines[0].p1 or line.p2 == lines[-1].p1:
       return CHECK_FAILED
    
@@ -117,13 +140,21 @@ def check(lines, line, map):
       return CHECK_FAILED
     if interset_len < number.number:
       exact = False
-       
-  if exact and line.p2 == lines[0].p1:
-    return CHECK_SUCCESS
-     
+
   if not exact and (lines and line.p2 == lines[0].p1):
     return CHECK_FAILED
-   
+    
+  if exact and line.p2 == lines[0].p1:
+    for zn in [num for num in map.numbers if num.number == 0]:
+      points = [(zn.p.x+i, zn.p.y+j) for i in range(2) for j in range(2)]
+      in_path = False
+      for p in points:
+        if p in (path_points + [line.p2]):
+          in_path = True
+      if not in_path:
+        return CHECK_FAILED
+    return CHECK_SUCCESS
+
   return CHECK_CONTINUE
 
 def count_line(lines, number):
@@ -133,8 +164,7 @@ def count_line(lines, number):
       if (s.p1 == li.p1 and s.p2 == li.p2) or (s.p2 == li.p1 and s.p1 == li.p2)])
 
 def solve_task(args):
-    map = args[0]
-    stack = args[1]
+    map, stack = args
     task_id = "(" + str(stack[0].last_point.x) + "," + str(stack[0].last_point.y) + ")"
     print "TASK", task_id, "STARED"
     while stack:
@@ -146,10 +176,19 @@ def solve_task(args):
       first_path = True
       for idx, (delta_x, delta_y) in enumerate(DIRECT):
         p2 = Point(p1.x+delta_x, p1.y+delta_y)
+        if p2.x < 0 or p2.y < 0 or p2.x > map.width or p2.y > map.height:
+          continue
+          
         debug_print("   Check", p2)
         line = Line(p1, p2)
         check_result = check(last_path, line, map)
         debug_print('Checking', lineToPoints(last_path + [line]))
+        
+        if VISUAL:
+          os.system('clear')
+          print_map(map, last_path + [line])
+          sleep(0.2)
+          
         if check_result == CHECK_CONTINUE:
           ok = True
           new_lines = copy(last_path)
@@ -176,19 +215,19 @@ def solve_task(args):
     return False
       
 def solve(map):
-  for x, y in [(map.width-i, map.height-j) for i in range(map.width) for j in range(map.height)]:
-    print "============= Starting", (x, y), "================="
-    solve_task((map, [StackElem(Point(x, y), True , [])]))
+  for x in range(map.width+1):
+    for y in range(map.height+1):
+      solve_task((map, [StackElem(Point(x, y), True , [])]))
   
 def solve_mp(map, pool_size=32): 
   from multiprocessing import Pool
   tasks = [(map, [StackElem(Point(x, y), True , [])]) 
-      for x, y in [(map.width-i, map.height-j) for i in range(map.width) for j in range(map.height)]]
+    for x in range(map.width+1) for y in range(map.height+1)]
 
   pool = Pool(pool_size)
   pool.map(solve_task, tasks)
 
-def print_map(map, lines, size=3):
+def print_map(map, lines, size=5):
   pic = []  # array of string
   xline = bytearray()
   yline = bytearray()
@@ -227,11 +266,10 @@ def print_map(map, lines, size=3):
   for num in map.numbers:
     pic[num.p.y*(size+1)+(size+1)/2][num.p.x*(size+1)+(size+1)/2] = str(num.number)
      
-  for l in pic:
-    print l
+  print "\n".join([str(l) for l in pic])
      
 if __name__ == "__main__":
-  map = maps[2]
+  map = maps[-1]
   print_map(map, [])
        
   MP = True
