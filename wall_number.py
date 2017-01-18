@@ -4,28 +4,28 @@ from copy import copy
 from datetime import datetime
 from time import sleep
 
-Map = namedtuple("Map", "height width numbers")
+Board = namedtuple("Board", "height width numbers")
 Point = namedtuple("Point", "x y")
 Line = namedtuple("Line", "p1 p2")
 StackElem = namedtuple("StackElem", "last_point first_path lines")
 Number = namedtuple("Number", "p number")
 
-maps = [
-    Map(height=2, width=2,
+boards = [
+    Board(height=2, width=2,
         numbers=[
             Number(Point(0, 1), 3),
             Number(Point(1, 0), 3),
             Number(Point(1, 1), 2),
         ]),
 
-    Map(height=2, width=3,
+    Board(height=2, width=3,
         numbers=[
             Number(Point(1, 0), 3),
             Number(Point(0, 1), 3),
             Number(Point(2, 1), 3),
         ]),
 
-    Map(height=5, width=5,
+    Board(height=5, width=5,
         numbers=[
             Number(Point(1, 0), 3),
             Number(Point(4, 0), 1),
@@ -40,7 +40,7 @@ maps = [
             Number(Point(2, 4), 2),
         ]),
 
-    Map(height=6, width=6,
+    Board(height=6, width=6,
         numbers=[
             Number(Point(0, 0), 1),
             Number(Point(4, 0), 3),
@@ -58,7 +58,7 @@ maps = [
             Number(Point(4, 5), 2),
         ]),
 
-    Map(height=6, width=6,
+    Board(height=6, width=6,
         numbers=[
             Number(Point(2, 0), 3),
             Number(Point(3, 0), 3),
@@ -77,7 +77,7 @@ maps = [
             Number(Point(5, 5), 1),
         ]),
 
-    Map(height=6, width=6,
+    Board(height=6, width=6,
         numbers=[
             Number(Point(0, 0), 0),
             Number(Point(3, 0), 1),
@@ -97,7 +97,7 @@ maps = [
             Number(Point(3, 5), 2),
         ]),
 
-    Map(height=6, width=6,
+    Board(height=6, width=6,
         numbers=[
             Number(Point(2, 0), 0),
             Number(Point(5, 0), 3),
@@ -116,7 +116,7 @@ maps = [
             Number(Point(4, 5), 2),
         ]),
 
-    Map(height=6, width=6,
+    Board(height=6, width=6,
         numbers=[
             Number(Point(0, 0), 1),
             Number(Point(2, 0), 2),
@@ -134,6 +134,101 @@ maps = [
             Number(Point(4, 4), 1),
             Number(Point(5, 4), 3),
             Number(Point(1, 5), 2),
+        ]),
+
+    Board(height=7, width=7,
+        numbers=[
+            Number(Point(1, 0), 2),
+            Number(Point(4, 0), 2),
+            Number(Point(6, 0), 0),
+            Number(Point(0, 1), 1),
+            Number(Point(1, 1), 2),
+            Number(Point(2, 1), 1),
+            Number(Point(5, 1), 2),
+            Number(Point(2, 2), 2),
+            Number(Point(3, 2), 2),
+            Number(Point(6, 2), 2),
+            Number(Point(1, 3), 1),
+            Number(Point(3, 3), 0),
+            Number(Point(6, 3), 3),
+            Number(Point(0, 4), 2),
+            Number(Point(4, 4), 2),
+            Number(Point(1, 5), 1),
+            Number(Point(4, 5), 1),
+            Number(Point(6, 5), 1),
+            Number(Point(2, 6), 3),
+            Number(Point(5, 6), 2),
+            Number(Point(6, 6), 0),
+        ]),
+    Board(height=7, width=7,
+        numbers=[
+            Number(Point(1, 0), 2),
+            Number(Point(3, 0), 1),
+            Number(Point(6, 0), 3),
+            Number(Point(0, 1), 1),
+            Number(Point(2, 1), 3),
+            Number(Point(5, 1), 2),
+            Number(Point(0, 2), 1),
+            Number(Point(3, 2), 0),
+            Number(Point(5, 2), 3),
+            Number(Point(0, 3), 0),
+            Number(Point(4, 3), 3),
+            Number(Point(1, 4), 2),
+            Number(Point(4, 4), 2),
+            Number(Point(6, 4), 0),
+            Number(Point(1, 5), 2),
+            Number(Point(3, 5), 3),
+            Number(Point(6, 5), 2),
+            Number(Point(0, 6), 3),
+            Number(Point(2, 6), 2),
+        ]),
+            
+    Board(height=7, width=7,
+        numbers=[
+            Number(Point(1, 0), 2),
+            Number(Point(2, 0), 2),
+            Number(Point(3, 0), 2),
+            Number(Point(5, 0), 0),
+            Number(Point(0, 1), 3),
+            Number(Point(2, 1), 0),
+            Number(Point(5, 1), 1),
+            Number(Point(1, 2), 3),
+            Number(Point(4, 2), 2),
+            Number(Point(0, 3), 2),
+            Number(Point(2, 3), 1),
+            Number(Point(6, 3), 2),
+            Number(Point(1, 4), 2),
+            Number(Point(4, 4), 3),
+            Number(Point(1, 5), 1),
+            Number(Point(2, 5), 3),
+            Number(Point(5, 5), 1),
+            Number(Point(1, 6), 0),
+            Number(Point(3, 6), 1),
+            Number(Point(6, 6), 3),
+        ]),
+
+    Board(height=7, width=7,
+        numbers=[
+            Number(Point(0, 0), 2),
+            Number(Point(4, 0), 2),
+            Number(Point(5, 0), 2),
+            Number(Point(1, 1), 1),
+            Number(Point(3, 1), 2),
+            Number(Point(6, 1), 2),
+            Number(Point(2, 2), 3),
+            Number(Point(4, 2), 2),
+            Number(Point(6, 2), 0),
+            Number(Point(0, 3), 1),
+            Number(Point(3, 3), 1),
+            Number(Point(5, 3), 1),
+            Number(Point(1, 4), 2),
+            Number(Point(4, 4), 1),
+            Number(Point(6, 4), 1),
+            Number(Point(3, 5), 2),
+            Number(Point(5, 5), 1),
+            Number(Point(0, 6), 1),
+            Number(Point(2, 6), 3),
+            Number(Point(5, 6), 2),
         ]),
 ]
 
@@ -165,14 +260,14 @@ def lineToPoints(lines):
     return [lines[0].p1] + [l.p2 for l in lines] if lines else []
 
 
-def check(lines, line, map):
+def check(lines, line, board):
     path_points = lineToPoints(lines)
     if line.p2 in path_points:
         if line.p2 != lines[0].p1 or line.p2 == lines[-1].p1:
             return CHECK_FAILED
 
     exact = True
-    for number in map.numbers:
+    for number in board.numbers:
         interset_len = count_line(lines + [line], number)
         if interset_len > number.number:
             return CHECK_FAILED
@@ -196,14 +291,14 @@ def count_line(lines, number):
                 if (s.p1 == li.p1 and s.p2 == li.p2) or (s.p2 == li.p1 and s.p1 == li.p2)])
 
 
-def splash(map, path):
+def splash(board, path):
     os.system('cls' if os.name == 'nt' else 'clear')
-    print_map(map, path)
+    print_board(board, path)
     sleep(0.2)
 
 
 def solve_task(args):
-    map, stack = args
+    board, stack = args
     task_id = "(" + str(stack[0].last_point.x) + \
         "," + str(stack[0].last_point.y) + ")"
     print("TASK " + str(task_id) + " STARED")
@@ -216,15 +311,15 @@ def solve_task(args):
         first_path = True
         for delta_x, delta_y in DIRECT:
             p2 = Point(p1.x + delta_x, p1.y + delta_y)
-            if p2.x < 0 or p2.y < 0 or p2.x > map.width or p2.y > map.height:
+            if p2.x < 0 or p2.y < 0 or p2.x > board.width or p2.y > board.height:
                 continue
 
             debug_print("   Check", p2)
             line = Line(p1, p2)
-            check_result = check(last_path, line, map)
+            check_result = check(last_path, line, board)
             debug_print('Checking', lineToPoints(last_path + [line]))
 
-            splash(map, last_path + [line])
+            #splash(board, last_path + [line])
 
             if check_result == CHECK_CONTINUE:
                 ok = True
@@ -237,7 +332,7 @@ def solve_task(args):
                 pass
             elif check_result == CHECK_SUCCESS:
                 debug_print('Found', last_path + [line])
-                print_map(map, last_path + [line])
+                print_board(board, last_path + [line])
                 print("TASK " + str(task_id) + " SUCCESS")
                 return True
         if not ok:
@@ -252,33 +347,33 @@ def solve_task(args):
     return False
 
 
-def solve(map):
-    for x in range(map.width + 1):
-        for y in range(map.height + 1):
-            solve_task((map, [StackElem(Point(x, y), True, [])]))
+def solve(board):
+    for x in range(board.width + 1):
+        for y in range(board.height + 1):
+            solve_task((board, [StackElem(Point(x, y), True, [])]))
 
 
-def solve_mp(map, pool_size=32):
+def solve_mp(board, pool_size=32):
     from multiprocessing import Pool
-    tasks = [(map, [StackElem(Point(x, y), True, [])])
-             for x in range(map.width + 1) for y in range(map.height + 1)]
+    tasks = [(board, [StackElem(Point(x, y), True, [])])
+             for x in range(board.width + 1) for y in range(board.height + 1)]
 
     pool = Pool(pool_size)
     pool.map(solve_task, tasks)
 
 
-def print_map(map, lines, size=5):
+def print_board(board, lines, size=5):
     pic = []  # array of string
     xline = bytearray()
     yline = bytearray()
-    for j in range(map.width * (size + 1) + 1):
+    for j in range(board.width * (size + 1) + 1):
         xline += '-'
         if j % (size + 1) == 0:
             yline += '|'
         else:
             yline += ' '
 
-    for i in range(map.height * (size + 1) + 1):
+    for i in range(board.height * (size + 1) + 1):
         if i % (size + 1) == 0:
             pic.append(copy(xline))
         else:
@@ -295,16 +390,16 @@ def print_map(map, lines, size=5):
             for s in range(size):
                 pic[p.y * (size + 1)][p.x * (size + 1) + 1 + s] = 'x'
 
-    for num in map.numbers:
+    for num in board.numbers:
         pic[num.p.y * (size + 1) + (size + 1) / 2][num.p.x *
-                                                   (size + 1) + (size + 1) / 2] = str(num.number)
+                  (size + 1) + (size + 1) / 2] = str(num.number)
 
     print("\n".join([str(l) for l in pic]))
 
 if __name__ == "__main__":
-    map = maps[-1]
-    print_map(map, [])
+    board = boards[-1]
+    print_board(board, [])
     now = datetime.now()
-    #solve_mp(map)
-    solve(map)
+    solve_mp(board, board.width * board.height)
+    #solve(board)
     print("Time =", datetime.now() - now)
