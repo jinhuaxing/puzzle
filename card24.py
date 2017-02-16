@@ -3,7 +3,6 @@ from enum import Enum
 
 OpTree = namedtuple("OpTree", "op left right")
 
-
 def solve(numbers, target):
   print 'Solving', target, numbers
   if len(numbers) == 1:
@@ -13,7 +12,6 @@ def solve(numbers, target):
       return None
       
   for i, n in enumerate(numbers):
-    n = numbers[i]
     sub_numbers = numbers[0:i] + numbers[i+1:]
     
     # target = n + sub_target
