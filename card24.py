@@ -17,40 +17,34 @@ def solve(numbers, target):
     # target = n + sub_target
     sub_target = target - n
     t = solve(sub_numbers, sub_target)
-    if t is not None:
-      return OpTree("+", n, t)
+    if t: return OpTree("+", n, t)
     
     # target = sub_target - n  
     sub_target = target + n  
     t = solve(sub_numbers, sub_target)
-    if t is not None:
-      return OpTree("-", t, n)
+    if t: return OpTree("-", t, n)
 
     # target = n - sub_target
     sub_target = n - target  
     t = solve(sub_numbers, sub_target)
-    if t is not None:
-      return OpTree("-", n, t)    
+    if t: return OpTree("-", n, t)    
       
     # target = n * sub_target
     if target % n == 0:
       sub_target = target / n
       t = solve(sub_numbers, sub_target)
-      if t is not None:
-        return OpTree("*", n, t)  
+      if t: return OpTree("*", n, t)  
         
     # target = n / sub_target
     if n % target == 0:
       sub_target = n / target
       t = solve(sub_numbers, sub_target)
-      if t is not None:
-        return OpTree("/", n, t)  
+      if t: return OpTree("/", n, t)  
         
     # target = sub_target / n
     sub_target = n * target
     t = solve(sub_numbers, sub_target)
-    if t is not None:
-      return OpTree("/", t, n) 
+    if t: return OpTree("/", t, n) 
    
   return None
   
@@ -64,10 +58,11 @@ def op_prio(op):
   
 def _print_child(parent, child):
   if type(child) ==  OpTree:
-    if op_prio(parent.op) > op_prio(child.op):
+    parenthesis  = op_prio(parent.op) > op_prio(child.op)
+    if parenthesis:
       print "(",
     print_optree(child)
-    if op_prio(parent.op) > op_prio(child.op):
+    if parenthesis:
       print ")",
   else:
     print child,
