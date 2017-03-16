@@ -36,7 +36,7 @@ def solve(numbers, target):
       if t: return OpTree("*", n, t)  
         
     # target = n / sub_target
-    if n % target == 0:
+    if target != 0 and n % target == 0:
       sub_target = n / target
       t = solve(sub_numbers, sub_target)
       if t: return OpTree("/", n, t)  
@@ -77,7 +77,7 @@ def print_optree(root):
   else:
     raise Exception("Error OpTree")
     
-s1 = solve([1, 2, 5, 8], 24)
+s1 = solve([3, 4, 6, 1], 24)
 if s1 is None:
   print 'FAILED'
 else:
