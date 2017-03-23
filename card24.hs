@@ -13,9 +13,10 @@ showOpTree (Leaf x) = show x
 showOpTree (Branch op left right) = showChild op left ++ [op] ++ showChild op right
 showChild pop child = case child of
     Leaf x -> show x
-    Branch op _ _  -> if opPrio pop > opPrio op
-              then "(" ++ showOpTree child ++ ")"
-              else showOpTree child
+    Branch op _ _  -> 
+          if opPrio pop > opPrio op
+          then "(" ++ showOpTree child ++ ")"
+          else showOpTree child
 
 solve :: [Int]->Int->Maybe OpTree
 solve [x] target = if x == target then Just (Leaf x) else Nothing
@@ -29,10 +30,10 @@ pickOne xs = pickOne1 (length xs - 1) xs
               
 solve1 :: [(Int, [Int])]->Int->Maybe OpTree
 solve1 [] _ = Nothing
-solve1 ((n, numbers):xs) target = case pr of
+solve1 ((n, numbers):xs) target = case subSolve n numbers txs of
              Nothing -> solve1 xs target
-             _ -> pr
-             where pr = (let txs = tryList n target in subSolve n numbers txs)
+             x -> x
+             where txs = tryList n target
                   
 tryList :: Int->Int->[(Char, Int, Bool)]
 tryList n target =
@@ -45,15 +46,13 @@ tryList n target =
     in xs3
 
 subSolve :: Int->[Int]->[(Char, Int, Bool)]->Maybe OpTree
-subSolve n subNumbers xs = case xs of
-       []      -> Nothing
-       (x:xs1) -> let (op, subTarget, leafLeft) = x
-                      pr = solve subNumbers subTarget
-                  in case pr of
-                       Nothing -> subSolve n subNumbers xs1
-                       Just t -> case leafLeft of 
-                                        True -> Just (Branch op (Leaf n) t)
-                                        False -> Just (Branch op t (Leaf n))
+subSolve _ _ [] = Nothing
+subSolve n subNumbers ((op, subTarget, leafLeft):xs1) = 
+    case solve subNumbers subTarget of
+        Nothing -> subSolve n subNumbers xs1
+        Just t -> case leafLeft of 
+            True -> Just (Branch op (Leaf n) t)
+            False -> Just (Branch op t (Leaf n))
 main = do
   case opTree of 
     Nothing -> putStrLn "FAILED"
