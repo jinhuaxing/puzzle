@@ -4,7 +4,6 @@ from enum import Enum
 OpTree = namedtuple("OpTree", "op left right")
 
 def solve(numbers, target):
-  print 'Solving', target, numbers
   if len(numbers) == 1:
     if numbers[0] == target:
       return numbers[0]
@@ -60,25 +59,25 @@ def _print_child(parent, child):
   if type(child) ==  OpTree:
     parenthesis  = op_prio(parent.op) > op_prio(child.op)
     if parenthesis:
-      print "(",
+      print("(",  end = '')
     print_optree(child)
     if parenthesis:
-      print ")",
+      print(")",  end = '')
   else:
-    print child,
+    print(child,  end = '')
       
 def print_optree(root):
   if type(root) == int:
-    print root,
+    print(root, end = '')
   elif type(root) == OpTree:
     _print_child(root, root.left)
-    print root.op, 
+    print (root.op, end = '')
     _print_child(root, root.right)
   else:
     raise Exception("Error OpTree")
     
-s1 = solve([3, 4, 6, 1], 24)
+s1 = solve([9, 7, 4, 3], 24)
 if s1 is None:
-  print 'FAILED'
+  print('FAILED')
 else:
   print_optree(s1)
